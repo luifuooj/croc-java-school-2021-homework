@@ -1,20 +1,14 @@
 package ru.luifuooj.repo;
 
-import org.apache.derby.jdbc.EmbeddedDataSource;
 import org.junit.jupiter.api.*;
 import ru.luifuooj.provider.DataSourceProvider;
 import ru.luifuooj.model.Fish;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-
-import static org.apache.derby.impl.sql.catalog.SYSUSERSRowFactory.TABLE_NAME;
 
 class FishRepositoryTest {
     private static FishRepository fishRepository;

@@ -1,3 +1,5 @@
 */.idea/
+*/fish_store/
+*.log
 */target/
 *.iml

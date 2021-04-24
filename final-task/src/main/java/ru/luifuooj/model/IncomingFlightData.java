@@ -5,52 +5,52 @@ import javax.xml.bind.annotation.XmlTransient;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 /**
  * Структура данных о входящих рейсах.
  */
 public class IncomingFlightData {
-    @XmlElement(name = "Flight number")
+
+    @XmlElement(name = "Flight")
     private String flightNumber;
+
     @XmlElement(name = "Airline")
     private String airline;
-    @XmlElement(name = "Point of departure")
+
+    @XmlElement(name = "From")
     private String pointOfDeparture;
+
     @XmlTransient
     private LocalDateTime departureDateTime;
-    @XmlElement(name = "Departure date and time")
+
+    @XmlElement(name = "Departure")
     private String departureDateTimeString;
-    @XmlElement(name = "Travel time")
+
+    @XmlElement(name = "Duration")
     private String travelTimeString;
+
     @XmlTransient
     private LocalTime travelTime;
+
     @XmlTransient
-    private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+    private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+
     @XmlTransient
     private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 
-    public IncomingFlightData(String flightNumber, String airline, String pointOfDeparture, LocalDateTime departureDateTime, LocalTime travelTime) {
+    public IncomingFlightData() {
+    }
+
+    public IncomingFlightData(String flightNumber, String airline, String pointOfDeparture,
+                              LocalDateTime departureDateTime, LocalTime travelTime) {
         this.flightNumber = flightNumber;
         this.airline = airline;
         this.pointOfDeparture = pointOfDeparture;
-        this.departureDateTimeString = convertDateToString(departureDateTime);
-        this.travelTimeString = convertTimeToString(travelTime);
-    }
-
-    private String convertDateToString(LocalDateTime date) {
-        return date.format(dateFormatter);
-    }
-
-    private LocalDateTime parseDateFromString(String date) {
-        return LocalDateTime.parse(date, dateFormatter);
-    }
-
-    private String convertTimeToString(LocalTime time) {
-        return time.format(timeFormatter);
-    }
-
-    private LocalTime parseTimeFromString(String time) {
-        return LocalTime.parse(time, timeFormatter);
+        this.departureDateTime = departureDateTime;
+        this.travelTime = travelTime;
+        this.departureDateTimeString = dateTimeFormatter.format(departureDateTime);
+        this.travelTimeString = timeFormatter.format(travelTime);
     }
 
     public String getFlightNumber() {
@@ -82,8 +82,8 @@ public class IncomingFlightData {
     }
 
     public void setDepartureDateTime(LocalDateTime departureDateTime) {
+        this.departureDateTimeString = dateTimeFormatter.format(departureDateTime);
         this.departureDateTime = departureDateTime;
-        this.departureDateTimeString = convertDateToString(departureDateTime);
     }
 
     public String getDepartureDateTimeString() {
@@ -91,8 +91,8 @@ public class IncomingFlightData {
     }
 
     public void setDepartureDateTimeString(String departureDateTimeString) {
+        this.departureDateTime = LocalDateTime.parse(departureDateTimeString, dateTimeFormatter);
         this.departureDateTimeString = departureDateTimeString;
-        this.departureDateTime = parseDateFromString(departureDateTimeString);
     }
 
     public String getTravelTimeString() {
@@ -100,8 +100,8 @@ public class IncomingFlightData {
     }
 
     public void setTravelTimeString(String travelTimeString) {
+        this.travelTime = LocalTime.parse(travelTimeString, timeFormatter);
         this.travelTimeString = travelTimeString;
-        this.travelTime = parseTimeFromString(travelTimeString);
     }
 
     public LocalTime getTravelTime() {
@@ -109,8 +109,36 @@ public class IncomingFlightData {
     }
 
     public void setTravelTime(LocalTime travelTime) {
+        this.travelTimeString = timeFormatter.format(travelTime);
         this.travelTime = travelTime;
-        this.travelTimeString = convertTimeToString(travelTime);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        IncomingFlightData that = (IncomingFlightData) o;
+        return flightNumber.equals(that.flightNumber) &&
+                airline.equals(that.airline);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(flightNumber, airline);
+    }
+
+    @Override
+    public String toString() {
+        return "IncomingFlightData{" +
+                "flightNumber='" + flightNumber + '\'' +
+                ", airline='" + airline + '\'' +
+                ", pointOfDeparture='" + pointOfDeparture + '\'' +
+                ", departureDateTime=" + departureDateTime +
+                ", departureDateTimeString='" + departureDateTimeString + '\'' +
+                ", travelTimeString='" + travelTimeString + '\'' +
+                ", travelTime=" + travelTime +
+                ", dateTimeFormatter=" + dateTimeFormatter +
+                ", timeFormatter=" + timeFormatter +
+                '}';
+    }
 }

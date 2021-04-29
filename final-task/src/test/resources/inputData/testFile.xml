@@ -1,7 +1,7 @@
-<IncomingFlightData>
+<InputFlightData>
     <Flight>123</Flight>
     <Airline>LN</Airline>
     <From>A</From>
     <Departure>01-01-2020 01:01</Departure>
     <Duration>01:01</Duration>
-</IncomingFlightData>
+</InputFlightData>

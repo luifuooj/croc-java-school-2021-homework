@@ -1,7 +1,8 @@
-<OutboundFlightData>
-    <Flight>231</Flight>
-    <Airline>AW</Airline>
-    <To>B</To>
-    <Arrival>01-02-2020 02:01</Arrival>
-    <Duration>01:01</Duration>
-</OutboundFlightData>
+<InputFlightData>
+    <FlightType>OUTBOUND</FlightType>
+    <Flight>1234</Flight>
+    <Airline>LN</Airline>
+    <Point>Yamal</Point>
+    <DateTime>10-10-2020 22:22</DateTime>
+    <Duration>03:50</Duration>
+</InputFlightData>

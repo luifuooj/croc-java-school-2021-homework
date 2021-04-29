@@ -1,7 +1,7 @@
 package ru.luifuooj.repository;
 
 import org.apache.derby.jdbc.EmbeddedDataSource;
-import ru.luifuooj.model.FlightData;
+import ru.luifuooj.model.InputFlightData;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -64,30 +64,40 @@ public class FlightRepository {
     /**
      * Добавление нового рейса в базу.
      */
-    public void create(FlightData flightData) {
+    public void create(InputFlightData iFlightData, InputFlightData oFlightData) {
+        if (!iFlightData.isSameFlight(oFlightData)) {
+            return;
+        }
         String sqlQuery = "INSERT INTO " + TABLE_NAME +
                 "( flight_number, airline, point_of_departure, departure_date, " +
                 "departure_time, travel_time, point_of_arrival, arrival_date, arrival_time ) " +
                 " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sqlQuery)) {
-            setFilledStatement(flightData, statement);
+            setFilledStatement(iFlightData, oFlightData, statement);
             statement.execute();
         } catch (Exception e) {
             printQueryException(e);
         }
     }
 
-    private void setFilledStatement(FlightData flightData, PreparedStatement statement) throws SQLException {
-        statement.setString(1, flightData.getFlightNumber());
-        statement.setString(2, flightData.getAirline());
-        statement.setString(3, flightData.getPointOfDeparture());
-        statement.setDate(4, Date.valueOf(flightData.getDepartureDate()));
-        statement.setTime(5, Time.valueOf(flightData.getDepartureTime()));
-        statement.setTime(6, Time.valueOf(flightData.getTravelTime()));
-        statement.setString(7, flightData.getPointOfArrival());
-        statement.setDate(8, Date.valueOf(flightData.getArrivalDate()));
-        statement.setTime(9, Time.valueOf(flightData.getArrivalTime()));
+    private void setFilledStatement(InputFlightData iFlightData, InputFlightData oFlightData,
+                                    PreparedStatement statement) throws SQLException {
+        statement.setString(1, iFlightData.getFlightNumber());
+        statement.setString(2, iFlightData.getAirline());
+        statement.setString(3, iFlightData.getPoint());
+        statement.setDate(4, Date.valueOf(iFlightData.getDepartureDateTime().toLocalDate()));
+        statement.setTime(5, Time.valueOf(iFlightData.getDepartureDateTime().toLocalTime()));
+        statement.setTime(6, Time.valueOf(iFlightData.getTravelTime()));
+        if (oFlightData != null) {
+            statement.setString(7, oFlightData.getPoint());
+            statement.setDate(8, Date.valueOf(oFlightData.getArrivalDateTime().toLocalDate()));
+            statement.setTime(9, Time.valueOf(oFlightData.getArrivalDateTime().toLocalTime()));
+        } else {
+            statement.setString(7, iFlightData.getPoint());
+            statement.setDate(8, Date.valueOf(iFlightData.getArrivalDateTime().toLocalDate()));
+            statement.setTime(9, Time.valueOf(iFlightData.getArrivalDateTime().toLocalTime()));
+        }
     }
 
     private void printQueryException(Exception e) {
@@ -96,11 +106,11 @@ public class FlightRepository {
 
     /**
      * Обновление информации о рейсах.
+     *
      * @param flightData информация о рейсе
      */
-    public void update(FlightData flightData) {
+    public void update(InputFlightData flightData) {
         if (flightData.getId() == null) {
-            create(flightData);
             return;
         }
         String sqlQuery = "UPDATE " + TABLE_NAME
@@ -115,7 +125,7 @@ public class FlightRepository {
                 + "arrival_time = ? WHERE id = ?";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sqlQuery)) {
-            setFilledStatement(flightData, statement);
+            setFilledStatement(flightData, null, statement);
             statement.setInt(10, flightData.getId());
             statement.execute();
         } catch (SQLException e) {
@@ -164,7 +174,7 @@ public class FlightRepository {
      * @param airline      авиакомпания
      * @return список
      */
-    public List<FlightData> findByFlightNumberAndAirline(String flightNumber, String airline) {
+    public List<InputFlightData> findByFlightNumberAndAirline(String flightNumber, String airline) {
         try (Connection connection = dataSource.getConnection();
              Statement statement = connection.createStatement()) {
             ResultSet resultSet = statement.executeQuery(String.format
@@ -183,7 +193,7 @@ public class FlightRepository {
      * @param id айди записи
      * @return список
      */
-    public List<FlightData> findById(Integer id) {
+    public List<InputFlightData> findById(Integer id) {
         try (Connection connection = dataSource.getConnection();
              Statement statement = connection.createStatement()) {
             ResultSet resultSet = statement.executeQuery(String.format
@@ -200,7 +210,7 @@ public class FlightRepository {
      *
      * @return список
      */
-    public List<FlightData> findAll() {
+    public List<InputFlightData> findAll() {
         try (Connection connection = dataSource.getConnection();
              Statement statement = connection.createStatement()) {
             ResultSet resultSet = statement.executeQuery("SELECT * FROM " + TABLE_NAME);
@@ -211,12 +221,11 @@ public class FlightRepository {
         return new ArrayList<>();
     }
 
-    private List<FlightData> setFilledFlightDataList(ResultSet resultSet) throws SQLException {
-        List<FlightData> flightData = new ArrayList<>();
+    private List<InputFlightData> setFilledFlightDataList(ResultSet resultSet) throws SQLException {
+        List<InputFlightData> flightData = new ArrayList<>();
         while (resultSet.next()) {
-
-           flightData.add(new FlightData(
-                   resultSet.getInt(1),
+            flightData.add(new InputFlightData(
+                    resultSet.getInt(1),
                     resultSet.getString(2),
                     resultSet.getString(3),
                     resultSet.getString(4),
@@ -226,7 +235,7 @@ public class FlightRepository {
                     resultSet.getString(8),
                     resultSet.getDate(9).toLocalDate(),
                     resultSet.getTime(10).toLocalTime()
-           ));
+            ));
         }
         return flightData;
     }

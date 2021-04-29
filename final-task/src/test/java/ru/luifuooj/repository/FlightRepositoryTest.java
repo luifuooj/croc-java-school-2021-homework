@@ -1,13 +1,14 @@
 package ru.luifuooj.repository;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import ru.luifuooj.dbprovider.DataSourceProvider;
-import ru.luifuooj.model.FlightData;
-import ru.luifuooj.model.IncomingFlightData;
-import ru.luifuooj.model.OutboundFlightData;
+import ru.luifuooj.model.InputFlightData;
+import ru.luifuooj.model.FlightType;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -19,47 +20,56 @@ import java.util.List;
  * Тестирование методов репозитория.
  */
 public class FlightRepositoryTest {
-    private static FlightRepository repository;
-    IncomingFlightData incomingFlightData = new IncomingFlightData(
-            "123",
-            "LN",
-            "A" ,
-            LocalDateTime.of(2020,1, 1, 1, 1),
-            LocalTime.of(1, 1));
-    OutboundFlightData outboundFlightData = new OutboundFlightData(
-            "123",
-            "LN",
-            "B",
-            LocalDateTime.of(2020, 1 , 1, 2, 1),
-            LocalTime.of(1,1));
-    FlightData flightData = new FlightData(incomingFlightData, outboundFlightData);
-    IncomingFlightData incomingFlightData2 = new IncomingFlightData(
-            "231",
-            "AW",
-            "A" ,
-            LocalDateTime.of(2020,2, 1, 1, 1),
-            LocalTime.of(1, 1));
-    OutboundFlightData outboundFlightData2 = new OutboundFlightData(
-            "231",
-            "AW",
-            "B",
-            LocalDateTime.of(2020, 2 , 1, 2, 1),
-            LocalTime.of(1, 1));
-    FlightData flightData2 = new FlightData(incomingFlightData2, outboundFlightData2);
 
-    IncomingFlightData incomingFlightData3 = new IncomingFlightData(
+    private static FlightRepository repository;
+
+    InputFlightData incomingFlightData = new InputFlightData(
+            FlightType.INCOMING,
+            "123",
+            "LN",
+            "A",
+            LocalDateTime.of(2020, 1, 1, 1, 1),
+            LocalTime.of(1, 1));
+
+    InputFlightData outboundFlightData = new InputFlightData(
+            FlightType.OUTBOUND,
+            "123",
+            "LN",
+            "B",
+            LocalDateTime.of(2020, 1, 1, 2, 1),
+            LocalTime.of(1, 1));
+
+    InputFlightData incomingFlightData2 = new InputFlightData(
+            FlightType.INCOMING,
+            "231",
+            "AW",
+            "A",
+            LocalDateTime.of(2020, 2, 1, 1, 1),
+            LocalTime.of(1, 1));
+
+    InputFlightData outboundFlightData2 = new InputFlightData(
+            FlightType.OUTBOUND,
+            "231",
+            "AW",
+            "B",
+            LocalDateTime.of(2020, 2, 1, 2, 1),
+            LocalTime.of(1, 1));
+
+    InputFlightData incomingFlightData3 = new InputFlightData(
+            FlightType.INCOMING,
             "lk87",
             "KZ",
-            "A" ,
-            LocalDateTime.of(2020,3, 1, 1, 1),
+            "A",
+            LocalDateTime.of(2020, 3, 1, 1, 1),
             LocalTime.of(1, 1));
-    OutboundFlightData outboundFlightData3 = new OutboundFlightData(
+
+    InputFlightData outboundFlightData3 = new InputFlightData(
+            FlightType.OUTBOUND,
             "lk87",
             "KZ",
             "B",
             LocalDateTime.of(2020, 3, 1, 2, 1),
-            LocalTime.of(1,1));
-    FlightData flightData3 = new FlightData(incomingFlightData3, outboundFlightData3);
+            LocalTime.of(1, 1));
 
     @BeforeAll
     public static void prepareConnect() throws IOException {
@@ -80,85 +90,85 @@ public class FlightRepositoryTest {
 
     @Test
     public void createTest() {
-        repository.create(flightData);
+        repository.create(incomingFlightData, outboundFlightData);
         System.out.println(repository.findAll());
-        Assertions.assertTrue(repository.findAll().contains(flightData));
+        assertTrue(repository.findAll().contains(incomingFlightData));
     }
+
     @Test
     public void updateTest() {
-        repository.create(flightData);
-        List<FlightData> flightDataList = repository.findAll();
-        Assertions.assertTrue(flightDataList.contains(flightData));
+        repository.create(incomingFlightData, outboundFlightData);
+        List<InputFlightData> flightDataList = repository.findAll();
+        assertTrue(flightDataList.contains(incomingFlightData));
 
-        FlightData updateFlight = repository.findByFlightNumberAndAirline("123", "LN").get(0);
+        InputFlightData updateFlight = repository.findByFlightNumberAndAirline("123", "LN").get(0);
         updateFlight.setAirline("BN");
         repository.update(updateFlight);
 
         System.out.println(repository.findAll());
 
         flightDataList = repository.findAll();
-        Assertions.assertFalse(flightDataList.contains(flightData));
-        Assertions.assertTrue(flightDataList.contains(updateFlight));
+        assertFalse(flightDataList.contains(incomingFlightData));
+        assertTrue(flightDataList.contains(updateFlight));
     }
 
     @Test
     public void findAllTest() {
-        repository.create(flightData);
-        repository.create(flightData2);
-        repository.create(flightData3);
+        repository.create(incomingFlightData, outboundFlightData);
+        repository.create(incomingFlightData2, outboundFlightData2);
+        repository.create(incomingFlightData3, outboundFlightData3);
 
-        List<FlightData> flightDataList = repository.findAll();
-        Assertions.assertTrue(flightDataList.contains(flightData));
-        Assertions.assertTrue(flightDataList.contains(flightData2));
-        Assertions.assertTrue(flightDataList.contains(flightData3));
+        List<InputFlightData> flightDataList = repository.findAll();
+        assertTrue(flightDataList.contains(incomingFlightData));
+        assertTrue(flightDataList.contains(incomingFlightData2));
+        assertTrue(flightDataList.contains(incomingFlightData3));
     }
 
     @Test
     public void findByIdTest() {
-        repository.create(flightData);
-        repository.create(flightData2);
-        List<FlightData> flightDataList = repository.findAll();
+        repository.create(incomingFlightData, outboundFlightData);
+        repository.create(incomingFlightData2, outboundFlightData2);
+        List<InputFlightData> flightDataList = repository.findAll();
         Integer id1 = flightDataList.get(0).getId();
 
-        List<FlightData> flightFindById = repository.findById(id1);
-        Assertions.assertTrue(flightFindById.contains(flightData));
-        Assertions.assertFalse(flightFindById.contains(flightData2));
+        List<InputFlightData> flightFindById = repository.findById(id1);
+        assertTrue(flightFindById.contains(incomingFlightData));
+        assertFalse(flightFindById.contains(incomingFlightData2));
     }
 
     @Test
     public void findByFlightNumberAndAirlineTest() {
-        repository.create(flightData);
-        repository.create(flightData2);
-        repository.create(flightData3);
+        repository.create(incomingFlightData, outboundFlightData);
+        repository.create(incomingFlightData2, outboundFlightData2);
 
-        List<FlightData> flightDataList = repository.findByFlightNumberAndAirline("123", "LN");
-        Assertions.assertTrue(flightDataList.contains(flightData));
-        Assertions.assertFalse(flightDataList.contains(flightData2));
+        List<InputFlightData> flightDataList = repository.findByFlightNumberAndAirline("123", "LN");
+        assertTrue(flightDataList.contains(incomingFlightData));
+        assertFalse(flightDataList.contains(incomingFlightData2));
     }
 
     @Test
     public void deleteByIdTest() {
-        repository.create(flightData);
-        repository.create(flightData2);
-        List<FlightData> flightDataList = repository.findAll();
-        Assertions.assertTrue(flightDataList.contains(flightData));
+        repository.create(incomingFlightData, outboundFlightData);
+        repository.create(incomingFlightData2, outboundFlightData2);
+        List<InputFlightData> flightDataList = repository.findAll();
+        assertTrue(flightDataList.contains(incomingFlightData));
         Integer id1 = flightDataList.get(0).getId();
 
         repository.deleteById(id1);
-        List<FlightData> flightDataList2 = repository.findAll();
-        Assertions.assertFalse(flightDataList2.contains(flightData));
-        Assertions.assertTrue(flightDataList2.contains(flightData2));
+        List<InputFlightData> flightDataList2 = repository.findAll();
+        assertFalse(flightDataList2.contains(incomingFlightData));
+        assertTrue(flightDataList2.contains(incomingFlightData2));
     }
 
     @Test
     public void deleteByFlightNumberAndAirlineTest() {
-        repository.create(flightData);
-        repository.create(flightData2);
-        List<FlightData> flightDataList = repository.findByFlightNumberAndAirline("231", "AW");
-        Assertions.assertTrue(flightDataList.contains(flightData2));
+        repository.create(incomingFlightData, outboundFlightData);
+        repository.create(incomingFlightData2, outboundFlightData2);
+        List<InputFlightData> flightDataList = repository.findByFlightNumberAndAirline("231", "AW");
+        assertTrue(flightDataList.contains(incomingFlightData2));
 
         repository.deleteByFlightNumberAndAirline("231", "AW");
         flightDataList = repository.findAll();
-        Assertions.assertFalse(flightDataList.contains(flightData2));
+        assertFalse(flightDataList.contains(incomingFlightData2));
     }
 }

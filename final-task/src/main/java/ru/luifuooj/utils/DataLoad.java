@@ -1,25 +1,25 @@
-package ru.luifuooj.utils.file;
+package ru.luifuooj.utils;
 
 import java.io.*;
 
-
-public class Storage {
+public class DataLoad {
     String pathToFiles = "src/main/resources/input/";
 
     /**
-     * Чтение xml-файла с диска.
+     * Чтение файла с диска.
+     *
      * @param fileName имя файла
-     * @return xml в виде строки
+     * @return данные в виде строки
      */
-    public String loadXmlData(String fileName) {
+    public String loadData(String fileName) {
         File file = new File(pathToFiles + fileName);
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
-            StringBuilder xmlString = new StringBuilder();
+            StringBuilder stringBuilder = new StringBuilder();
             String line;
             while ((line = bufferedReader.readLine()) != null) {
-                xmlString.append(line);
+                stringBuilder.append(line);
             }
-            return xmlString.toString();
+            return stringBuilder.toString();
         } catch (IOException e) {
             e.printStackTrace();
             return null;

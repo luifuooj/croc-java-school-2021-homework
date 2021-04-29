@@ -1,7 +1,6 @@
 package ru.luifuooj.service;
 
-
-import ru.luifuooj.model.FlightData;
+import ru.luifuooj.model.InputFlightData;
 import ru.luifuooj.repository.FlightRepository;
 
 import java.util.List;
@@ -21,7 +20,7 @@ public class FlightService {
      *
      * @return список
      */
-    public List<FlightData> getAll() {
+    public List<InputFlightData> getAll() {
         return repository.findAll();
     }
 
@@ -32,17 +31,17 @@ public class FlightService {
      * @param airline      авиакомпания
      * @return список
      */
-    public List<FlightData> getFlightByNumberAndAirline(String flightNumber, String airline) {
+    public List<InputFlightData> getFlightByNumberAndAirline(String flightNumber, String airline) {
         return repository.findByFlightNumberAndAirline(flightNumber, airline);
     }
 
     /**
      * Добавление рейса.
      *
-     * @param flightData рейс
+     * @param iFlightData рейс
      */
-    public void create(FlightData flightData) {
-        repository.create(flightData);
+    public void create(InputFlightData iFlightData, InputFlightData oFlightData) {
+        repository.create(iFlightData, oFlightData);
     }
 
     /**

@@ -1,4 +1,4 @@
-package ru.luifuooj.utils.file;
+package ru.luifuooj.utils;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -11,16 +11,16 @@ import java.io.IOException;
 /**
  * Тестирование загрузки файла с диска.
  */
-public class StorageTest {
+public class DataLoadTest {
     String testFileName = "testFile.xml";
     String pathToFiles = "src/test/resources/inputData/";
-    String xmlFile = "<IncomingFlightData>" +
+    String xmlFile = "<InputFlightData>" +
             "    <Flight>123</Flight>" +
             "    <Airline>LN</Airline>" +
             "    <From>A</From>" +
             "    <Departure>01-01-2020 01:01</Departure>" +
             "    <Duration>01:01</Duration>" +
-            "</IncomingFlightData>";
+            "</InputFlightData>";
 
     @Test
     public void loadTest() {
